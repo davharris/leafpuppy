@@ -82,3 +82,5 @@ bdone=Button(axdone, 'Done')
 bdone.on_clicked(callback.gtfo)
 
 plt.show()
+
+print data
