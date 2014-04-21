@@ -17,7 +17,7 @@ imageplot = function(x, ...){
 w=5;h=5;offset = -.01
 x = processed.image
 f = matrix(1, nc=2*w+1, nr=2*h+1) ; f=f/sum(f) ; 
-soft.thresh = x-filter2(x, f)+offset
+soft.thresh = plogis(100 * (x-filter2(x, f)) + 1)
 
 png("morphology.png", width = 2048, height = 2048)
 par(mfrow = c(2, 2))
