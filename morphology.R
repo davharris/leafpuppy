@@ -19,8 +19,10 @@ imageplot = function(x, ...){
 # Based on procedure from ?EBImage::thresh
 w=10;h=10;offset = -.01
 x = processed.image
-f = matrix(1, nc=2*w+1, nr=2*h+1) ; f=f/sum(f) ; 
-soft.thresh = plogis(100 * (x-filter2(x, f)) + 1)
+f = matrix(1, nc=2*w+1, nr=2*h+1) ; f=f/sum(f)
+diff = (x-filter2(x, f))
+diff = (diff - mean(diff)) / sd(diff)
+soft.thresh = plogis(2 * diff + 1)
 
 png("morphology.png", width = 2048, height = 2048)
 par(mfrow = c(2, 2))
