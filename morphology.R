@@ -1,3 +1,6 @@
+# Procedure based on code suggested by Stack Overflow user "dhanushka"
+# http://stackoverflow.com/a/23177924/783153
+
 library("EBImage")
 library(png)
 img = readPNG("images/wMTjH3L.png")
@@ -14,7 +17,7 @@ imageplot = function(x, ...){
 
 
 # Based on procedure from ?EBImage::thresh
-w=5;h=5;offset = -.01
+w=10;h=10;offset = -.01
 x = processed.image
 f = matrix(1, nc=2*w+1, nr=2*h+1) ; f=f/sum(f) ; 
 soft.thresh = plogis(100 * (x-filter2(x, f)) + 1)
@@ -28,6 +31,8 @@ imageplot(soft.thresh, main = "soft threshold")
 imageplot(
   thresh(
     processed.image,
+    w = w,
+    h = h,
     offset = offset
   ),
   main = "hard threshold"
