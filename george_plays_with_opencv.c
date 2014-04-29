@@ -6,7 +6,7 @@
 
 #define BOXSIZE 10
 #define BOXSIZEEQ 10
-
+  
 int *findCOM(IplImage*);
 int *findDarkestRegion(IplImage*);
 int *calcCDF(IplImage *);
