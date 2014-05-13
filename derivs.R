@@ -5,6 +5,8 @@ filename = "images/v018-penn.9-1uB2D2-cropb"
 
 img = readPNG(paste0(filename, ".png"))
 
+img = openingGreyScale(img, makeBrush(5, shape = "disc"))
+
 sigma = 2
 
 kern = makeBrush(
@@ -13,7 +15,7 @@ kern = makeBrush(
   sigma = sigma
 )
 
-img = openingGreyScale(img, makeBrush(5, shape = "disc"))
+
 img = filter2(img, kern)
 
 
@@ -67,3 +69,9 @@ image(sqrt(pmax(eigenvalues1, 0)^2 + pmax(eigenvalues2, 0)^2), asp = 1, col = gr
 dev.off()
 
 
+
+# Dot removal
+to.remove = eigenvalues2 > quantile(eigenvalues2, .97)
+removed = readPNG(paste0(filename, ".png"))[-c(1, 500), -c(1, 500)]
+removed[to.remove] = max(removed)
+image(removed, asp = 1, main = "dot removal", , col = gray.colors(100, start = 0, end = 1))
