@@ -52,3 +52,7 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+.Rproj.user
+images/wMTjH3L.png
+leafpuppy.Rproj
+morphology.png
