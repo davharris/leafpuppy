@@ -44,7 +44,8 @@ eigenvalues = abind(
 
 eigenvalues[,,1]
 
-# X * (eigenvalue - dxx) / dxy  = Y
+# Find the angle of the dominant eigenvector
+# Algebra says eigenvector falls along this line: Y=X * (eigenvalue - dxx) / dxy
 # let X=1
 theta = atan2(eigenvalues[,,1] - dxx, dxy)
 
