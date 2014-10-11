@@ -15,3 +15,4 @@ Pipeline:
   * Auxiliary features?
     * Histogram of image intensities to help deal with intensity/contrast
   * SVM classifier? RBF kernel?
+  * Something that can run online/in minibatches, in case memory constraints are a problem?
