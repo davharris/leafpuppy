@@ -10,13 +10,13 @@ from scipy.stats import logistic
 
 filename = "skeletons & matching cropped pics/cropped pics/v018-penn.9-1uB2D2-cropm.png"
 
-coins = io.imread(filename)
-coins = (np.mean(coins) - coins) / np.std(coins)
+img = io.imread(filename)
+img = (img - np.mean(img)) / np.std(img)
 
 
-sigma = 1.
+sigma = .75
 
-Hxx, Hxy, Hyy = hessian_matrix(coins, sigma=sigma, mode="wrap")
+Hxx, Hxy, Hyy = hessian_matrix(img, sigma=sigma, mode="wrap")
 
 
 e1, e2 = hessian_matrix_eigvals(Hxx, Hxy, Hyy)
@@ -24,9 +24,10 @@ e1, e2 = hessian_matrix_eigvals(Hxx, Hxy, Hyy)
 # How much bigger is the first eigenvalue's magnitude
 # compared with the second?
 
-condition = abs(e1/e2)
+log_condition = np.log(abs(e1/e2))
+log_condition = log_condition / np.std(log_condition)
 
-out = logistic.cdf(np.log(condition))
+out = logistic.cdf(log_condition)
 
 markers = np.zeros_like(out)
 markers[out < 0] = 1

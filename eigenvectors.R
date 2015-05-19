@@ -3,15 +3,15 @@ library(png)
 library(tiff)
 library(abind)
 library(raster)
-filename = "v018-penn.9-1uB2D2-cropt"
+filename = "v018-penn.9-1uB2D2-cropm"
 
 raw.img = readPNG(paste0("skeletons & matching cropped pics/cropped pics/", filename, ".png"))
 
 breaks = seq(0, 1, .05)
 col.scale = gray.colors(length(breaks), start = 1, end = 0)
 
-myplot = function(x){
-  image(raster(matrix(x, ncol = 500)), col = col.scale, maxpixels = 500^2, asp = 1)
+myplot = function(x, ...){
+  image(raster(matrix(x, ncol = 500)), col = col.scale, maxpixels = 500^2, asp = 1, ...)
 }
 
 # dx==TRUE: derivative in the x direction.  dx==FALSE: derivative in the y direction
@@ -78,8 +78,7 @@ f = function(img, sigma){
 
 gamma = .01
 
-img = medianFilter(raw.img, 2)@.Data[,,1]
-img = 1 - img^gamma
+img = 1 - raw.img^gamma
 img = (img - gblur(img, 20))
 img = img - min(img)
 img = img / max(img)
@@ -106,6 +105,8 @@ d = do.call(
   )
 )
 
+stop()
+
 d = cbind(
   d, 
   sapply(
@@ -117,6 +118,47 @@ d = cbind(
 )
 
 train = sample.int(nrow(d), nrow(d) / 5)
+# non_edge = row(img)[train] > 20 & row(img)[train] < 480 & 
+#   col(img)[train] > 20 & col(img)[train]
+# train = train[non_edge]
+
+
+library(nnet)
+n = nnet(scale(d)[train, ], c(erode(skeleton))[train], size = 10, entropy = TRUE, decay = .1, maxit = 1E3)
+
+p = predict(n, scale(d))
+pp = predict(glm(c(skeleton) ~ p, family = binomial), type = "response")
+myplot(-pp)
+
+# 
+# 
+# library(fastICA)
+# ica = fastICA(scale(d[, grep("e1", colnames(d))]), 2)
+# z = ica$S
+# par(mfrow = c(1, 2))
+# for(i in 1:2){
+#   myplot(z[,i])
+# }
+# 
+# ica = fastICA(scale(d[, grep("e2", colnames(d))]), 2)
+# z2 = ica$S
+# 
+# ica = fastICA(scale(d[, grep("^H_", colnames(d))]), 2)
+# z_H = ica$S
+# 
+# ica = fastICA(scale(d[, grep("^.$", colnames(d))]), 2)
+# z_dog = ica$S
+# 
+# 
+# d = cbind(
+#   d[ , -grep("e1|e2|H_|^.$", colnames(d))],
+#   e1_new = z,
+#   e2_new = z2,
+#   H_new = z_H,
+#   dog_new = z_dog
+# )
+
+
 
 library(gbm)
 g = gbm(
@@ -124,11 +166,11 @@ g = gbm(
   data = d[train, ], 
   distribution = "bernoulli",
   interaction.depth = 2,
-  n.trees = 100,
-  shrinkage = .1,
+  n.trees = 1000,
+  shrinkage = .001,
   verbose = TRUE
 )
-
+g = gbm.more(g, 1000)
 
 p = predict(g, newdata = d, n.trees = g$n.trees, type = "response")
 pp = predict(glm(c(skeleton) ~ c(qlogis(p)), family = binomial), type = "response")
@@ -136,6 +178,8 @@ pp = predict(glm(c(skeleton) ~ c(qlogis(p)), family = binomial), type = "respons
 par(mfrow = c(1, 2))
 myplot(1-raw.img)
 myplot(pp)
+
+library(nnet)
 
 
 
